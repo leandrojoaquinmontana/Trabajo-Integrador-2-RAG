@@ -1,0 +1,21 @@
+# Entornos locales
+.venv/
+venv/
+env/
+.env
+.env.*
+!.env.example
+
+# Archivos generados por Python y Jupyter
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+
+# Índices vectoriales y bases locales reconstruibles desde el notebook
+chroma_db_*/
+*.sqlite3
+
+# Archivos del sistema y registros locales
+.DS_Store
+Thumbs.db
+*.log
