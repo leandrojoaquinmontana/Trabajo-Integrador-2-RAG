@@ -18,6 +18,8 @@ load_dotenv(RAIZ / ".env")
 
 MODELO_GENERADOR = os.getenv("OLLAMA_MODEL", "granite4:latest")
 MODELO_EMBEDDINGS = os.getenv("OLLAMA_EMBEDDING_MODEL", "bge-m3")
+TAMANO_FRAGMENTO = 1100
+SOLAPAMIENTO_FRAGMENTO = 180
 CARPETA_INDICE = RAIZ / "chroma_db_cct_sanidad"
 NOMBRE_COLECCION = "cct_sanidad_3_docs_bge_m3_amplio"
 RUTAS_CCT = [
@@ -232,8 +234,8 @@ def preparar_indice() -> Chroma:
         return indice
 
     divisor = RecursiveCharacterTextSplitter(
-        chunk_size=1200,
-        chunk_overlap=180,
+        chunk_size=TAMANO_FRAGMENTO,
+        chunk_overlap=SOLAPAMIENTO_FRAGMENTO,
     )
     fragmentos = divisor.split_documents(cargar_documentos())
     identificadores = [f"fragmento_{numero}" for numero in range(len(fragmentos))]
