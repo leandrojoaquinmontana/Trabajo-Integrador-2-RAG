@@ -11,7 +11,7 @@ contrastarse con la evidencia mostrada y con el PDF original.
 ## Contenido de la entrega
 
 - `Trabajo_Integrador_2_CCT_Sanidad_3Docs.ipynb`: análisis completo y reproducible.
-- `interfaz_gradio.py`: interfaz local para consultar el RAG.
+- `app.py`: interfaz local para consultar el RAG.
 - `datos/`: los tres documentos reales utilizados por el sistema.
 - `requirements.txt`: dependencias de Python.
 
@@ -40,6 +40,7 @@ pruebas. No contienen datos personales incorporados por este proyecto.
 ## Instalación
 
 ```powershell
+irm https://ollama.com/install.ps1 | iex (en caso de no tener ollama instalado para windows)
 uv venv --python 3.12
 .venv\Scripts\Activate.ps1
 uv pip install -r requirements.txt
@@ -57,7 +58,7 @@ prueba.
 Para iniciar la interfaz Gradio:
 
 ```powershell
-python interfaz_gradio.py
+python app.py
 ```
 
 La interfaz muestra por separado la respuesta del modelo y los fragmentos
@@ -65,7 +66,7 @@ recuperados, con el convenio, el nombre del archivo, la página y la distancia
 de búsqueda. La primera ejecución puede tardar porque crea el índice local.
 
 Para reconstruir el índice, eliminá `chroma_db_cct_sanidad/` y ejecutá de
-nuevo el notebook o `python interfaz_gradio.py`. El índice se crea desde los
+nuevo el notebook o `python app.py`. El índice se crea desde los
 PDF de `datos/`; no se debe versionar. El notebook y la interfaz usan el mismo
 corte de `1100` caracteres con `180` de solapamiento, `bge-m3`, colección
 Chroma y `k=3`.
@@ -114,12 +115,7 @@ del PDF y debe verificarse contra el documento original.
 ## Uso de IA
 
 Se utilizó GitHub Copilot durante la revisión y construcción del proyecto para
-organizar el código, mejorar la documentación, revisar el cumplimiento de las
-consignas. Los modelos del sistema son `bge-m3` para
-embeddings y `granite4:latest` para generación, ambos ejecutados localmente
-con Ollama. Se verificaron personalmente los archivos, las páginas citadas,
-los parámetros del pipeline, las respuestas de prueba y la ejecución sintáctica
-de la interfaz.
+organizar el código, mejorar la documentación y asegurar el cumplimiento de las consignas. Los modelos del sistema son `bge-m3` para embeddings y `granite4:latest` para generación, ambos ejecutados localmente con Ollama. Se verificaron personalmente los archivos, las páginas citadas, los parámetros del pipeline, las respuestas de prueba y la ejecución sintáctica de la interfaz.
 
 ## Verificación
 
