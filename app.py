@@ -169,8 +169,29 @@ ESTILOS = """
 }
 
 .cct-sources {
-    max-height: 560px;
+    max-height: 520px;
     overflow-y: auto;
+}
+
+.cct-chatbot {
+    min-height: 430px !important;
+    border-color: var(--cct-line) !important;
+    background: #ffffff !important;
+}
+
+.cct-chatbot .message {
+    color: var(--cct-ink) !important;
+}
+
+.cct-audit {
+    margin-top: 1rem;
+    border-color: var(--cct-line) !important;
+    background: #ffffff !important;
+}
+
+.cct-audit > .label-wrap {
+    color: var(--cct-navy) !important;
+    font-weight: 700 !important;
 }
 
 @media (max-width: 700px) {
@@ -258,19 +279,25 @@ PLANTILLA = ChatPromptTemplate.from_messages([
 ])
 
 INDICE: Chroma | None = None
+MENSAJE_INICIAL = "Hola. Consultá sobre los CCT 108/75, 103/75 y 122/75."
 
 
-def consultar(pregunta: str) -> tuple[str, str]:
-    """Recupera evidencia y devuelve la respuesta y las fuentes por separado."""
+def consultar(
+    pregunta: str,
+    historial: list[dict[str, str]] | None,
+) -> tuple[list[dict[str, str]], str, str]:
+    """Agrega una pregunta al chat y devuelve su respuesta y auditoría."""
+    historial = list(historial or [])
     if not pregunta.strip():
-        return "Escribí una pregunta.", "Todavía no se consultaron fuentes."
+        historial.append({"role": "assistant", "content": "Escribí una pregunta."})
+        return historial, "Todavía no se consultaron fuentes.", ""
 
     if INDICE is None:
         raise RuntimeError("El índice debe prepararse antes de abrir la interfaz.")
 
     hallazgos = INDICE.similarity_search_with_score(query=pregunta, k=3)
     contexto = ""
-    fuentes = ""
+    auditoria = "### Fuentes recuperadas\n\n"
 
     for numero, (documento, distancia) in enumerate(hallazgos, start=1):
         nombre = Path(str(documento.metadata.get("source", "sin fuente"))).name
@@ -281,8 +308,8 @@ def consultar(pregunta: str) -> tuple[str, str]:
             referencia += f", página {pagina + 1}"
 
         contexto += f"[{numero}] {referencia}\n{documento.page_content}\n\n"
-        fuentes += f"**[{numero}] {referencia}** (distancia {distancia:.3f})\n\n"
-        fuentes += f"```text\n{documento.page_content}\n```\n\n"
+        auditoria += f"**[{numero}] {referencia}** · distancia `{distancia:.3f}`\n\n"
+        auditoria += f"```text\n{documento.page_content}\n```\n\n"
 
     modelo = ChatOllama(model=MODELO_GENERADOR, temperature=0)
     respuesta = (PLANTILLA | modelo | StrOutputParser()).invoke(
@@ -294,7 +321,11 @@ def consultar(pregunta: str) -> tuple[str, str]:
     if respuesta.startswith("No encuentro esa información en los documentos."):
         respuesta = "No encuentro esa información en los documentos."
 
-    return respuesta, fuentes
+    historial.extend([
+        {"role": "user", "content": pregunta},
+        {"role": "assistant", "content": respuesta},
+    ])
+    return historial, auditoria, ""
 
 
 if __name__ == "__main__":
@@ -315,50 +346,57 @@ if __name__ == "__main__":
             """
         )
 
-        with gr.Row(equal_height=False):
-            with gr.Column(scale=5, elem_classes=["cct-panel"]):
-                pregunta = gr.Textbox(
-                    label="Tu consulta",
-                    placeholder="Ej.: ¿Cuántos días de licencia por matrimonio establece el CCT 108/75?",
-                    lines=3,
-                    elem_classes=["cct-question"],
-                )
-                with gr.Row():
-                    consultar_btn = gr.Button("Consultar documentos", variant="primary", elem_classes=["cct-submit"])
-                    limpiar_btn = gr.ClearButton([pregunta], value="Limpiar")
-                gr.Examples(
-                    examples=[
-                        ["¿Cuántos días de licencia especial por matrimonio establece el CCT 108/75?"],
-                        ["¿Qué adicional mensual reciben las enfermeras de Terapia Intensiva según el CCT 103/75?"],
-                        ["¿Cuántos días de licencia por matrimonio otorgan el CCT 122/75 y el CCT 108/75?"],
-                    ],
-                    inputs=pregunta,
-                    label="Consultas de ejemplo",
-                )
-
-            with gr.Column(scale=7, elem_classes=["cct-panel"]):
-                respuesta = gr.Textbox(
-                    label="Respuesta del modelo",
-                    lines=5,
-                    interactive=False,
-                    elem_classes=["cct-output"],
-                )
-                fuentes = gr.Markdown(
-                    label="Evidencia recuperada",
-                    value="Los fragmentos utilizados aparecerán aquí.",
+        with gr.Column(elem_classes=["cct-panel"]):
+            conversacion = gr.Chatbot(
+                label="Conversación",
+                value=[{"role": "assistant", "content": MENSAJE_INICIAL}],
+                elem_classes=["cct-chatbot"],
+            )
+            with gr.Accordion(
+                "Auditoría de recuperación",
+                open=False,
+                elem_classes=["cct-audit"],
+            ):
+                auditoria = gr.Markdown(
+                    "La auditoría aparecerá después de realizar una consulta.",
                     elem_classes=["cct-sources"],
                 )
 
+            pregunta = gr.Textbox(
+                label="Tu consulta",
+                placeholder="Ej.: ¿Cuántos días de licencia por matrimonio establece el CCT 108/75?",
+                lines=2,
+                elem_classes=["cct-question"],
+            )
+            with gr.Row():
+                consultar_btn = gr.Button("Consultar documentos", variant="primary", elem_classes=["cct-submit"])
+                limpiar_btn = gr.Button("Nueva consulta")
+            gr.Examples(
+                examples=[
+                    ["¿Cuántos días de licencia especial por matrimonio establece el CCT 108/75?"],
+                    ["¿Qué adicional mensual reciben las enfermeras de Terapia Intensiva según el CCT 103/75?"],
+                    ["¿Cuántos días de licencia por matrimonio otorgan el CCT 122/75 y el CCT 108/75?"],
+                ],
+                inputs=pregunta,
+                label="Consultas de ejemplo",
+            )
+
         consultar_btn.click(
             fn=consultar,
-            inputs=pregunta,
-            outputs=[respuesta, fuentes],
+            inputs=[pregunta, conversacion],
+            outputs=[conversacion, auditoria, pregunta],
         )
         pregunta.submit(
             fn=consultar,
-            inputs=pregunta,
-            outputs=[respuesta, fuentes],
+            inputs=[pregunta, conversacion],
+            outputs=[conversacion, auditoria, pregunta],
         )
-        limpiar_btn.add(components=[respuesta, fuentes])
+        limpiar_btn.click(
+            fn=lambda: ([{"role": "assistant", "content": MENSAJE_INICIAL}],
+                        "La auditoría aparecerá después de realizar una consulta.",
+                        ""),
+            inputs=None,
+            outputs=[conversacion, auditoria, pregunta],
+        )
 
     interfaz.launch(theme=TEMA, css=ESTILOS, js=FORZAR_MODO_CLARO)

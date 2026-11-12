@@ -61,9 +61,11 @@ Para iniciar la interfaz Gradio:
 python app.py
 ```
 
-La interfaz muestra por separado la respuesta del modelo y los fragmentos
-recuperados, con el convenio, el nombre del archivo, la página y la distancia
-de búsqueda. La primera ejecución puede tardar porque crea el índice local.
+La interfaz presenta las consultas y respuestas en formato de conversación.
+La evidencia recuperada queda disponible en la sección desplegable
+`Auditoría de recuperación`, con el convenio, el nombre del archivo, la página,
+los fragmentos y la distancia de búsqueda. La primera ejecución puede tardar
+porque crea el índice local.
 
 Para reconstruir el índice, eliminá `chroma_db_cct_sanidad/` y ejecutá de
 nuevo el notebook o `python app.py`. El índice se crea desde los
