@@ -119,8 +119,6 @@ del PDF y debe verificarse contra el documento original.
 Se utilizó GitHub Copilot durante la revisión y construcción del proyecto para
 organizar el código, mejorar la documentación y asegurar el cumplimiento de las consignas. Los modelos del sistema son `bge-m3` para embeddings y `granite4:latest` para generación, ambos ejecutados localmente con Ollama. Se verificaron personalmente los archivos, las páginas citadas, los parámetros del pipeline, las respuestas de prueba y la ejecución sintáctica de la interfaz.
 
-## Verificación
+## Autor: Leandro Joaquin Montaña
+## Fecha de entrega: Miércoles 18 de noviembre
 
-Las respuestas deben contrastarse con los fragmentos mostrados y con el PDF
-original. La distancia de Chroma ordena los candidatos recuperados, pero no es
-una medida de certeza.
