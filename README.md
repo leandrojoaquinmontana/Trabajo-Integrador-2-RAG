@@ -109,10 +109,7 @@ como una garantía del modelo.
 
 El sistema no es un buscador general ni una fuente legal autónoma. Puede
 recuperar fragmentos parecidos pero irrelevantes y el modelo puede interpretar
-mal la evidencia o no abstenerse ante una pregunta fuera del corpus. Los PDF
-se procesan con extracción de texto; una tabla, columna o página escaneada
-podría producir texto incompleto. La página mostrada corresponde al índice
-del PDF y debe verificarse contra el documento original.
+mal la evidencia o no abstenerse ante una pregunta fuera del corpus.
 
 ## Uso de IA
 
