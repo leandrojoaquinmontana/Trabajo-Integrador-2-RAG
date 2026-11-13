@@ -109,12 +109,12 @@ como una garantía del modelo.
 
 El sistema no es un buscador general ni una fuente legal autónoma. Puede
 recuperar fragmentos parecidos pero irrelevantes y el modelo puede interpretar
-mal la evidencia o no abstenerse ante una pregunta fuera del corpus.
+mal la evidencia o no abstenerse ante una pregunta fuera del corpus, ya que el corpus no es lo suficientemente completo como para abarcar todas las posibles preguntas.
 
 ## Uso de IA
 
-Se utilizó GitHub Copilot durante la revisión y construcción del proyecto para
-organizar el código, mejorar la documentación y asegurar el cumplimiento de las consignas. Los modelos del sistema son `bge-m3` para embeddings y `granite4:latest` para generación, ambos ejecutados localmente con Ollama. Se verificaron personalmente los archivos, las páginas citadas, los parámetros del pipeline, las respuestas de prueba y la ejecución sintáctica de la interfaz.
+Se utilizó GitHub Copilot durante la revisión del proyecto para
+organizar el código, mejorar la documentación y asegurar el cumplimiento de las consignas. Los modelos del sistema son `bge-m3` para embeddings y `granite4:latest` para generación, ambos ejecutados localmente con Ollama. Se verificaron personalmente los archivos, las páginas citadas, los parámetros, las respuestas de prueba y la ejecución de la interfaz.
 
 ## Autor: Leandro Joaquin Montaña
 ## Fecha de entrega: Miércoles 18 de noviembre
